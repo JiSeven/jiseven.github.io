@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>От класса к функции. React Hooks</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="stylesheet" href="shower/themes/ribbon/styles/styles.css" />
+        
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/styles/default.min.css"
+        />
+        <style>
+            .shower {
+                --slide-ratio: calc(16 / 9);
+            }
+        </style>
+    </head>
+    <body class="shower list">
+        <header class="caption"></header>
+        <section class="slide" id="cover">
+            <h2>От класса к функции. React Hooks</h2>
+            <figure>
+                <img class="cover" src="pictures/cover.jpg" alt="react js" />
+                <p>
+                    Шумиловский Игорь (<a
+                        href="http://twitter.com/ishumilouski/"
+                        >@ishumilouski</a
+                    >)
+                </p>
+                <p class="place bottom">GDG Minsk February Meetup, 28 февраля 2019</p>
+            </figure>
+            <style>
+                #cover h2 {
+                    margin: 30px 0 0;
+                    color: white;
+                    text-align: center;
+                    font-size: 70px;
+                }
+
+                #cover p {
+                    margin: 50px 0 0;
+                    text-align: center;
+                    color: #fff;
+                    font-style: italic;
+                    font-size: 20px;
+                    opacity: 0.75;
+                }
+
+                #cover p a {
+                    color: white;
+                }
+            </style>
+        </section>
+
+        <section class="slide">
+          <h2>Обо мне</h2>
+          <p class="place center left" style="margin-left: 100px">
+            <span>Шумиловский Игорь</span> <br /> 
+            <small>Frontend-разработчик в <a href="https://spiralscout.com">@spiralscout.com</a></small></p>
+          <img src="pictures/me.jpg" class="place right cover h" alt="">
+        </section>
+
+        <section class="slide">
+          <h2>План</h2>
+          <ul>
+            <li>Проблемы</li>
+            <li>Как решить?</li>
+            <li>Плюсы/минусы решения</li>
+            <li>Что получим в итоге?</li>
+          </ul>
+        </section>
+
+        <section class="slide">
+            <h2>Проблемы</h2>
+            <ul>
+                <li>Огромные компоненты</li>
+                <li>Wrapper hell</li>
+                <li>Классы запутывают людей и машин</li>
+            </ul>
+        </section>
+
+        <section class="slide">
+            <h2 class="place center">Огромные компоненты</h2>
+        </section>
+
+          <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>}</code>
+            </pre>
+        </section>
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <div class="next" >
+                <code>    </code>
+                <code>      componentWillUnmount() {</code>
+                <code>          this.cancelPendingRequest()</code>
+                <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+                <code>          this.removeEvents()</code>
+                <code>      }</code>
+            </div>
+
+            
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <div >
+                <code>    </code>
+                <code>      componentWillUnmount() {</code>
+                <code>          this.cancelPendingRequest()</code>
+                <code>          <mark>this.unsubscribeFromStore(this.props.user.id)</mark><span class="comment">// ID был 1, стал 2</span></code>
+                <code>          this.removeEvents()</code>
+                <code>      }</code>
+            </div>
+
+            
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (<mark>prevProps.user.id</mark> !== <mark>this.props.user.id</mark>) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(<mark>prevProps.user.id</mark>)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(<mark>this.props.user.id</mark>)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 14px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code> </code>
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              </code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 12px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          this.cancelPendingRequest()</code>
+            <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+            <code>          this.removeEvents()</code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 12px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>      componentDidMount() {</code>
+            <code>          <mark>this.fetchMessageHistory(this.props.user.id)</mark></code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          <mark>this.cancelPendingRequest()</mark></code>
+            <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+            <code>          this.removeEvents()</code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              <mark>this.cancelPendingRequest()</mark></code>
+            <code>              <mark>this.fetchMessageHistory(this.props.user.id)</mark></code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+
+
+        <section class="slide">
+            <pre style="font-size: 12px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</mark></code>
+            <code>          <mark>this.subscribeToStore(this.props.user.id)</mark></code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          this.cancelPendingRequest()</code>
+            <code>          <mark>this.unsubscribeFromStore(this.props.user.id)</mark></code>
+            <code>          this.removeEvents()</code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              <mark>this.unsubscribeFromStore(prevProps.user.id)</mark></code>
+            <code>              <mark>this.subscribeToStore(this.props.user.id)</mark></code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 12px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</mark></code>
+            <code>          this.subscribeToStore(this.props.user.id)</mark></code>
+            <code>          <mark>this.attachEvents()</mark></code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          this.cancelPendingRequest()</code>
+            <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+            <code>          <mark>this.removeEvents()</mark></code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+        <section class="slide">
+            <h2 class="place center">Wrapper hell</h2>
+        </section>
+
+        <section class="slide">
+            <h2>Dev tools</h2>
+            <img
+                class="place bottom left"
+                width="400"
+                src="pictures/wrapper_hell.png"
+                style="margin-left: 100px; margin-bottom: 20px"
+            />
+        </section>
+
+        <section class="slide">
+          <h2 class="place center">А что не так?</h2>
+          <img src="pictures/thinking.jpg" alt="" width="300" class="place bottom left">
+        </section>
+
+        
+
+        <section class="slide">
+          <pre>
+            <code>function MyComponent({ isFetching }) {</code>
+            <code>    ...</code>
+            <code>}</code>
+            <code>  </code>
+            <code>export default withConnect(MyComponent)</code>
+          </pre>
+        </section>
+
+        <section class="slide">
+          <pre>
+            <code>function MyComponent({ <mark>isFetching</mark> }) {</code>
+            <code>    ...</code>
+            <code>}</code>
+            <code>  </code>
+            <code>export default withConnect(MyComponent)</code>
+          </pre>
+        </section>
+
+        <section class="slide">
+          <img src="pictures/i_dont_know.gif" alt="" class="cover">
+        </section>
+
+        <section class="slide">
+            <h2>dev tools</h2>
+            <img
+                class="place center left"
+                width="500"
+                src="pictures/wrapper_hell_2.png"
+                style="margin-left: 100px; margin-top: 50px"
+            />
+        </section>
+
+        <section class="slide">
+          <img src="pictures/noo.gif" alt="" class="cover">
+        </section>
+
+        <section class="slide">
+            <h2 class="place center">Классы</h2>
+        </section>
+
+        <section class="slide">
+          <div class="columns two">
+            <div>
+              <h2>Классы - барьер для изучения</h2>
+            </div>
+            <img src="pictures/barier.gif"  alt="">
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="columns two">
+            <div>
+              <h2>Классы - барьер для изучения, <span style="font-size: 20px">потому что</span></h2>
+              <ul>
+                <li>Нужно понимать <code>this</code></li>
+              </ul>
+            </div>
+            <img src="pictures/barier.gif"  alt="">
+          </div>
+        </section>
+
+        <section class="slide">
+          <div class="columns two">
+            <div>
+              <h2>Классы - барьер для изучения, <span style="font-size: 20px">потому что</span></h2>
+              <ul>
+                <li>Нужно понимать <code>this</code></li>
+                <li>Помнить про <code>bind</code> методов</li>
+              </ul>
+            </div>
+            <img src="pictures/barier.gif"  alt="">
+          </div>
+        </section>
+
+        <section class="slide">
+            <h2>Классы - проблема для инструментов</h2>
+              <div>
+                <ul class="place center left" style="margin-left: 100px">
+                  <li class="next">Названия методов не минифицируются</li>
+                  <li class="next">Неиспользуемые методы не вырезаются</li>
+                  <li class="next">Hot reloading работает хуже</li>
+                </ul>
+              </div>
+              <img class="place bottom right" src="pictures/confused_robot.gif" alt="" />
+        </section>
+
+        <section class="slide">
+          <h2 class="place center">Что тогда использовать?</h2>
+        </section>
+
+        <section class="slide">
+          <h2 class="place center">React Hooks</h2>
+        </section>
+
+        <section class="slide">
+            <img class="cover" src="pictures/hallelua.gif" alt="" />
+        </section>
+
+  
+
+        <section class="slide">
+            <pre style="font-size: 20px">
+        <code>import React, { useState } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    const [value, setValue] = useState('');</code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 20px">
+        <code>import React, { <mark>useState</mark> } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    <mark>const [value, setValue] = useState('');</mark></code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+        </section>
+
+        
+
+        <section class="slide">
+            <pre style="font-size: 20px">
+        <code>import React, { useState } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    const [<mark>value</mark>, setValue] = useState('');</code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+        </section>
+
+        <section class="slide">
+            <pre style="font-size: 20px">
+        <code>import React, { useState } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    const [value, <mark>setValue</mark>] = useState('');</code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+        </section>
+
+<section class="slide">
+            <pre style="font-size: 20px">
+        <code>import React, { useState } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    const [value, setValue] = useState(<mark>''</mark>);</code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+        </section>
+
+<section class="slide">
+          <div class="columns two">
+<pre style="font-size: 11px">
+        <code>class TextField extends React.Component {</code>
+        <code>    constructor() {</code>
+        <code>        super();</code>
+        <code>        this.state = { value: '' };</code>
+        <code>        this.setValue = this.setValue.bind(this);</code>
+        <code>    }</code>
+        <code>    setValue(event) {</code>
+        <code>        this.setState({</code>
+        <code>            value: event.target.value,</code>
+        <code>        });</code>
+        <code>    }</code>
+        <code>    render() {</code>
+        <code>        return (</code>
+        <code>            &lt;input</code>
+        <code>                type="text"</code>
+        <code>                value={this.state.value}</code>
+        <code>                onChange={this.setValue}</code>
+        <code>            /></code>
+        <code>        )</code>
+        <code>    }</code>
+        <code>}</code>
+      </pre>
+        <h2 style="margin-left: 50px; margin-top: 200px">Класс-компонент</h2>
+        </section>
+
+
+        <section class="slide">
+            <pre style="font-size: 16px">
+        <code>import React, { useState, <mark>useEffect</mark> } from 'react';</code>
+        <code>    </code>
+        <code>function TextField() {</code>
+        <code>    const [value, setValue] = useState('');</code>
+        <code>    <mark>useEffect(() => {</mark></code>
+        <code>    <mark>    document.title = value;</mark></code>
+        <code>    <mark>});</mark> <span class="comment">// аналогично componentDidMount и componentDidUpdate</span></code>
+        <code>    return (</code>
+        <code>        &lt;input</code>
+        <code>            type="text"</code>
+        <code>            value={value}</code>
+        <code>            onChange={(event) => setValue(event.target.value)}</code>
+        <code>        /></code>
+        <code>    )</code>
+        <code>}</code>
+      </pre>
+
+
+        </section>
+
+<section class="slide">
+  <div class="columns two">
+            <pre style="font-size: 9px">
+        <code>class TextField extends React.Component {</code>
+        <code>    constructor() {</code>
+        <code>        super();</code>
+        <code>        this.state = { value: '' };</code>
+        <code>        this.setValue = this.setValue.bind(this);</code>
+        <code>    }</code>
+        <code>    componentDidMount() {</code>
+        <code>        document.title = this.state.value;</code>
+        <code>    }</code>
+        <code>    componentDidUpdate() {</code>
+        <code>        document.title = this.state.value;</code>
+        <code>    }</code>
+        <code>    setValue(event) {</code>
+        <code>        this.setState({</code>
+        <code>            value: event.target.value,</code>
+        <code>        });</code>
+        <code>    }</code>
+        <code>    render() {</code>
+        <code>        return (</code>
+        <code>            &lt;input</code>
+        <code>                type="text"</code>
+        <code>                value={this.state.value}</code>
+        <code>                onChange={this.setValue}</code>
+        <code>            /></code>
+        <code>        )</code>
+        <code>    }</code>
+        <code>}</code>
+      </pre>
+
+        <h2 style="margin-left: 50px; margin-top: 200px">Класс-компонент</h2>
+    </div>
+
+        </section>
+<section class="slide">
+            <pre style="font-size: 12px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      render() { return ... }</code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          this.cancelPendingRequest()</code>
+            <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+            <code>          this.removeEvents()</code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+        </pre>
+        </section>
+
+       <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section> 
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   useEffect(() => {</code>
+           <code>       fetchMessageHistory(user.id);</code>
+           <code>   });</code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   useEffect(() => {</code>
+           <code>       fetchMessageHistory(user.id);</code>
+           <code>       <mark>return () => cancelPendingRequest();</mark> <span class="comment">// componentWillUnmount</span></code>
+           <code>   });</code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   useEffect(() => {</code>
+           <code>       fetchMessageHistory(user.id);</code>
+           <code>       return () => cancelPendingRequest();</code>
+           <code>   }, <mark>[user.id]</mark>); <span class="comment">// вызывать эффект только при изменении user.id</span></code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   ... </code>
+           <code>   useEffect(() => {</code>
+           <code>       subscribeToStore(user.id);</code>
+           <code>       return () => unsubscribeFromStore(user.id);</code>
+           <code>   }, [user.id]);</code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+      <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   ... </code>
+           <code>   useEffect(() => {</code>
+           <code>       attachEvents();</code>
+           <code>       return () => removeEvents();</code>
+           <code>   });</code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React, { useEffect } from 'react';</code>
+           <code> </code>
+           <code>function UserChat({ user }) {</code>
+           <code>   ... </code>
+           <code>   useEffect(() => {</code>
+           <code>       attachEvents();</code>
+           <code>       return () => removeEvents();</code>
+           <code>   }, <mark>[]</mark>);<span class="comment">// componentDidMount && componentWillUnmount only</span></code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+<section class="slide">
+  <div class="columns two">
+         <pre style="font-size: 13px">
+           <code>function UserChat({ user }) {</code>
+           <code>   useEffect(() => {</code>
+           <code>       fetchMessageHistory(user.id);</code>
+           <code>       return () => cancelPendingRequest();</code>
+           <code>   }, [user.id]);</code>
+           <code> </code>
+           <code>   useEffect(() => {</code>
+           <code>       subscribeToStore(user.id);</code>
+           <code>       return () => unsubscribeFromStore(user.id);</code>
+           <code>   }, [user.id]);</code>
+           <code> </code>
+           <code>   useEffect(() => {</code>
+           <code>       attachEvents();</code>
+           <code>       return () => removeEvents();</code>
+           <code>   }, []);</code>
+           <code> </code>
+           <code>   return ...</code>
+           <code>}</code>
+         </pre>
+
+        <h2 style="margin-left: 50px; margin-top: 200px">React Hooks</h2>
+        </div>
+       </section>
+
+      <section class="slide">
+  <div class="columns two">
+            <pre style="font-size: 11px">
+            <code>class UserChat extends React.Component {</code>
+            <code>      componentDidMount() {</code>
+            <code>          this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          this.subscribeToStore(this.props.user.id)</code>
+            <code>          this.attachEvents()</code>
+            <code>      }</code>
+
+            <code>      componentWillUnmount() {</code>
+            <code>          this.cancelPendingRequest()</code>
+            <code>          this.unsubscribeFromStore(this.props.user.id)</code>
+            <code>          this.removeEvents()</code>
+            <code>      }</code>
+
+            <code>      componentDidUpdate(prevProps) {</code>
+            <code>          if (prevProps.user.id !== this.props.user.id) {</code>
+            <code>              this.unsubscribeFromStore(prevProps.user.id)</code>
+            <code>              this.subscribeToStore(this.props.user.id)</code>
+            <code>              this.cancelPendingRequest()</code>
+            <code>              this.fetchMessageHistory(this.props.user.id)</code>
+            <code>          }</code>
+            <code>      }</code>
+            <code>      render() { return ... }</code>
+            <code>}</code>
+        </pre>
+
+        <h2 style="margin-left: 50px; margin-top: 200px">Класс-компонент</h2>
+    </div>
+
+        </section>
+
+      <section class="slide">
+        <h2 class="place center">Как переиспользовать?</h2>
+      </section>
+
+       <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code>function UserChat() {</code>
+           <code>   ...</code>
+           <code>   const width = ???</code>
+           <code>   return &lt;Container width={width}>{...}&lt;/Container></code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+          <p style="opacity: .6">src/hooks.js</p>
+         <pre style="font-size: 12px">
+           <code>export function useWindowWidth() {</code>
+           <code> </code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+          <p style="opacity: .6">src/hooks.js</p>
+         <pre style="font-size: 12px">
+           <code>import { useEffect } from 'react';</code>
+           <code> </code>
+           <code>export function useWindowWidth() {</code>
+           <code>   const [width, setWidth] = useState(window.innerWidth);</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+          <p style="opacity: .6">src/hooks.js</p>
+         <pre style="font-size: 12px">
+           <code>import { useEffect } from 'react';</code>
+           <code> </code>
+           <code>export function useWindowWidth() {</code>
+           <code>   const [width, setWidth] = useState(window.innerWidth);</code>
+           <code> </code>
+           <code>   function handleWindowResize() {</code>
+           <code>       setWidth(window.innerWidth);</code>
+           <code>   }</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+          <p style="opacity: .6">src/hooks.js</p>
+         <pre style="font-size: 12px">
+           <code>import { useEffect } from 'react';</code>
+           <code> </code>
+           <code>export function useWindowWidth() {</code>
+           <code>   const [width, setWidth] = useState(window.innerWidth);</code>
+           <code> </code>
+           <code>   function handleWindowResize() {</code>
+           <code>       setWidth(window.innerWidth);</code>
+           <code>   }</code>
+
+           <code> </code>
+           <code>   useEffect(() => {</code>
+           <code>       window.addEventListener('resize', handleWindowResize)</code>
+           <code>       return () => window.removeEventListener('resize', handleWindowResize)</code>
+           <code>   }, []);</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+          <p style="opacity: .6">src/hooks.js</p>
+         <pre style="font-size: 12px">
+           <code>import { useEffect } from 'react';</code>
+           <code> </code>
+           <code>export function useWindowWidth() {</code>
+           <code>   const [width, setWidth] = useState(window.innerWidth);</code>
+           <code> </code>
+           <code>   function handleWindowResize() {</code>
+           <code>       setWidth(window.innerWidth);</code>
+           <code>   }</code>
+
+           <code> </code>
+           <code>   useEffect(() => {</code>
+           <code>       window.addEventListener('resize', handleWindowResize)</code>
+           <code>       return () => window.removeEventListener('resize', handleWindowResize)</code>
+           <code>   }, []);</code>
+           <code> </code>
+           <code>   return width;</code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code>function UserChat() {</code>
+           <code>   ...</code>
+           <code>   const width = ???</code>
+           <code>   return &lt;Container width={width}>{...}&lt;/Container></code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code><mark>import { useWindowWidth } from './hooks';</mark></code>
+           <code> </code>
+           <code>function UserChat() {</code>
+           <code>   ...</code>
+           <code>   const width = ???</code>
+           <code>   return &lt;Container width={width}>{...}&lt;/Container></code>
+           <code>}</code>
+         </pre>
+       </section>
+
+
+<section class="slide">
+         <pre style="font-size: 20px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code>import { useWindowWidth } from './hooks';</code>
+           <code> </code>
+           <code>function UserChat() {</code>
+           <code>   ...</code>
+           <code>   const width = <mark>useWindowWidth();</mark></code>
+           <code>   return &lt;Container width={width}>{...}&lt;/Container></code>
+           <code>}</code>
+         </pre>
+       </section>
+      
+      <section class="slide">
+         <pre style="font-size: 18px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code>import { useWindowWidth } from './hooks';</code>
+           <code> </code>
+           <code>function Card() {</code>
+           <code>   const width = useWindowWidth();</code>
+           <code>   if (width > 960) {</code>
+           <code>       return &lt;div className="card card-large">{...}&lt;/div></code>
+           <code>   }</code>
+           <code>   return &lt;div className="card">{...}&lt;/div></code>
+           <code>}</code>
+         </pre>
+       </section>
+
+        <section class="slide">
+         <pre style="font-size: 18px">
+           <code>import React from 'react';</code>
+           <code> </code>
+           <code><mark>import { useWindowWidth } from './hooks';</mark></code>
+           <code> </code>
+           <code>function Card() {</code>
+           <code>   const width = <mark>useWindowWidth();</mark></code>
+           <code>   if (width > 960) {</code>
+           <code>       return &lt;div className="card card-large">{...}&lt;/div></code>
+           <code>   }</code>
+           <code>   return &lt;div className="card">{...}&lt;/div></code>
+           <code>}</code>
+         </pre>
+       </section>
+
+       <section class="slide">
+         <h2 class="place center">Какие бывают?</h2>
+       </section>
+       <section class="slide">
+         <div class="columns two">
+           <div>
+             <h2>Базовые</h2>
+<ul>
+           <li>useState</li>
+           <li>useEffect</li>
+           <li>useContext</li>
+         </ul>
+           </div>
+          <div class="next">
+             <h2>Дополнительные</h2>
+<ol>
+           <li>useReducer</li>
+           <li>useCallback</li>
+           <li>useMemo</li>
+           <li>useRef</li>
+           <li>useImperativeHandle</li>
+           <li>useLayoutEffect</li>
+           <li>useDebugValue</li>
+         </ol>
+           </div>
+
+         </div>
+         
+       </section>
+
+       <section class="slide">
+         <h2 class="place center">А есть еще?</h2>
+       </section>
+
+       <section class="slide">
+         <h2 class="place center">
+<a href="https://github.com/rehooks/awesome-react-hooks">awesome react hooks</a>
+         </h2>
+       </section>
+
+<section class="slide">
+         <h2>Соотношение жизненных циклов</h2>
+         <ol style="font-size: 20px">
+           <li class="next">
+              <mark>constructor</mark> - useState
+           </li>
+
+           <li class="next">
+              <mark>getDerivedStateFromProps</mark> - тело функции
+           </li>
+
+           <li class="next">
+              <mark>shouldComponentUpdate</mark> - useMemo
+           </li>
+
+           <li class="next">
+              <mark>componentDidMount, componentDidUpdate, componentWillUnmount</mark> - useEffect
+           </li>
+
+           <li class="next">
+              <mark>componentDidCatch, getDerivedStateFromError</mark> - в разработке
+           </li>
+         </ol>
+       </section>
+
+       <section class="slide">
+         <h2>Правила использования</h2>
+         <ol>
+           <li class="next">Вызывать наверху React-функций</li>
+           <li class="next">Вызывать внутри кастомных хуков</li>
+           <li class="next">Не вызывать внутри циклов</li>
+           <li class="next">Не вызывать внутри условий</li>
+           <li class="next">Не вызывать внутри вложенных функций</li>
+         </ol>
+       </section>
+
+       <section class="slide">
+         <p class="place center">npm install eslint-plugin-react-hooks</p>
+       </section>
+
+       <section class="slide">
+         <h2>Итого</h2>
+         <p>Плюсы</p>
+         <ul>
+           <li class="next">Не нужно трансформировать компонент в класс</li>
+           <li class="next">Убирают wrapper hell и большие компоненты</li>
+           <li class="next">Это обычные функции</li>
+           <li class="next">Кастомные хуки</li>
+         </ul>
+       </section>
+
+<section class="slide">
+         <h2>Итого</h2>
+         <p>Минусы</p>
+         <ul>
+           <li class="next">Нужно следовать правилам</li>
+         </ul>
+       </section>
+
+      <section class="slide">
+         <h2 class="place center">Могу использовать?</h2>
+       </section>
+
+      <section class="slide">
+         <h2 class="shout">Да!</h2>
+         <img class="place bottom right" src="pictures/hurray.png" width="400" alt="">
+       </section>
+
+
+      <section class="slide">
+        <h2 class="place center">v.16.8.0</h2>
+       </section>
+
+        <section class="slide">
+          <h2 class="place center">Не ломает старый API</h2>
+       </section>
+
+        <section class="slide" id="thanks">
+            <h2 >Вопросы?</h2>
+            <div class="">
+
+            <p class="social social_twi">
+                <a href="https://twitter.com/ishumilouski">ishumilouski</a>
+            </p>
+
+            <p class="social social_fb">
+                <a href="https://www.facebook.com/jadex177">jadex177</a>
+            </p>
+            </div>
+        </section>
+
+        <div class="progress"></div>
+
+        <style>
+            #thanks .social {
+                position: relative;
+                margin-right: 360px;
+                padding-left: 72px;
+            }
+            #thanks .social:before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 48px;
+                height: 48px;
+                background-size: 48px 48px;
+                background-repeat: no-repeat;
+            }
+            #thanks .social_twi:before {
+                background-image: url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M31.993%206.077c-1.177.523-2.441.876-3.77%201.033%201.355-.812%202.396-2.098%202.887-3.63-1.269.751-2.673%201.299-4.168%201.592-1.198-1.275-2.904-2.072-4.793-2.072-3.625%200-6.562%202.938-6.562%206.563%200%20.514.057%201.016.169%201.496-5.455-.274-10.291-2.887-13.529-6.858-.564.97-.888%202.097-.888%203.3%200%202.278%201.159%204.286%202.919%205.464-1.075-.035-2.087-.329-2.972-.821l-.001.082c0%203.181%202.262%205.834%205.265%206.437-.55.149-1.13.23-1.729.23-.424%200-.834-.041-1.234-.117.834%202.606%203.259%204.504%206.13%204.558-2.245%201.76-5.075%202.811-8.15%202.811-.53%200-1.053-.031-1.566-.092%202.904%201.86%206.354%202.947%2010.061%202.947%2012.072%200%2018.675-10.001%2018.675-18.675%200-.284-.008-.568-.02-.85%201.283-.925%202.395-2.08%203.276-3.398z%22%20fill%3D%22%2355ACEE%22/%3E%3C/svg%3E');
+            }
+
+            #thanks .social_fb:before {
+			        background-image: url('data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2032%2032%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M18%2032v-14h6l1-6h-7v-3c0-2%201.002-3%203-3h3v-6h-5c-5%200-7%203-7%208v4h-6v6h6v14h6z%22%20fill%3D%22%233B5998%22/%3E%3C/svg%3E');
+			      }
+        </style>
+        <script src="shower/shower.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.14.2/highlight.min.js"></script>
+        <!-- Copyright © 3000 Yours Truly, Famous Inc. -->
+        <script>
+            hljs.initHighlightingOnLoad();
+        </script>
+    </body>
+</html>
